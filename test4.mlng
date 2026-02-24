@@ -1,0 +1,6 @@
+int sumar(a, b):
+    return a + b
+
+int resultado
+resultado = sumar(5, 3)
+Write(resultado)
