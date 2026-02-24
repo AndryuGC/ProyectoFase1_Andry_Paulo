@@ -3,6 +3,7 @@ Curso: Compiladores
 Fase: Proyecto #1 – Analizador Léxico  
 Lenguaje utilizado: Python  
 Paulo Klee - 1078023
+Andry González - 2000924
 
 
 --Descripción del Proyecto
