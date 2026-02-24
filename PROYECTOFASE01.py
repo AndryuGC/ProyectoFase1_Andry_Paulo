@@ -183,13 +183,59 @@ class Lexer:
                 f"line {self.line_num}, col 1: error de indentacion invalida"
             )
 
+def summarize_tokens(tokens, errors):
+    summary = {
+        "KEYWORDS": 0,
+        "ID": 0,
+        "INT": 0,
+        "FLOAT": 0,
+        "STRING": 0,
+        "OPERATORS": 0,
+        "SYMBOLS": 0,
+        "INDENT": 0,
+        "DEDENT": 0,
+        "NEWLINE": 0,
+        "EOF": 0,
+    }
+
+    keyword_types = set(KEYWORDS.values())
+    operators_types = set(OPERATORS.values())
+    symbol_types = set(SYMBOLS.values())
+
+    for t in tokens:
+        if t.type in keyword_types:
+            summary["KEYWORDS"] +=1
+        elif t.type == "ID":
+            summary["ID"] +=1
+        elif t.type == "INT":
+            summary["INT"] +=1
+        elif t.type == "FLOAT":
+            summary["FLOAT"] +=1
+        elif t.type == "STRING":
+            summary["STRING"] +=1
+        elif t.type == "OPERATORS":
+            summary["OPERATORS"] +=1
+        elif t.type == "SYMBOLS":
+            summary["SYMBOLS"] +=1
+        elif t.type == "INDENT":
+            summary["INDENT"] +=1
+        elif t.type == "DEDENT":
+            summary["DEDENT"] +=1
+        elif t.type == "NEWLINE":
+            summary["NEWLINE"] +=1
+        elif t.type == "EOF":
+            summary["EOF"] +=1
+
+    totalTokens = len(tokens)
+
+    return summary, totalTokens, len(errors)
+
 import os
 
 def main():
     print("MiniLang - Analizador Léxico")
     print("Buscando archivos .mlng...\n")
 
-    # Buscar todos los archivos .mlng en la carpeta actual
     files = [f for f in os.listdir() if f.endswith(".mlng")]
 
     if not files:
@@ -206,16 +252,27 @@ def main():
             print(f"Error al leer {filename}: {e}")
             continue
 
-        # Crear lexer con el contenido
         lexer = Lexer(text)
         tokens = lexer.tokenize()
 
-        # Crear archivo de salida .out
+        summary, total, err_count = summarize_tokens(tokens, lexer.errors)
+
+        # construir resumen en una sola línea
+        summary_parts = [f"Total={total}"]
+        summary_parts += [f"{k}={v}" for k, v in summary.items()]
+        summary_parts.append(f"ERRORES={err_count}")
+        summary_line = "Resumen: " + " | ".join(summary_parts)
+
         out_file = filename.replace(".mlng", ".out")
 
-        with open(out_file, "w", encoding="utf-8") as f:
-            for t in tokens:
-                f.write(str(t) + "\n")
+        try:
+            with open(out_file, "w", encoding="utf-8") as f:
+                for t in tokens:
+                    f.write(str(t) + "\n")
+                f.write(summary_line + "\n")
+        except Exception as e:
+            print(f"Error al escribir {out_file}: {e}")
+            continue
 
         if lexer.errors:
             print("  → errores encontrados:")
@@ -223,6 +280,8 @@ def main():
                 print("    ", e)
         else:
             print("  → analisis completado")
+
+        print("  → " + summary_line)
 
     print("\nProceso finalizado.")
 
