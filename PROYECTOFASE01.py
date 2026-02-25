@@ -67,15 +67,15 @@ class Lexer:
         self.tokens.append(Token("EOF", None, self.line_num, 1, 1))
         return self.tokens
 
-    def process_line(self, raw_line):
+    def procces_line(self, raw_line):
         i = 0
         col = 1
-
-        spaces = 0
-        while i < len(raw_line) and raw_line[i] == " ":
+        
+        spcaes = 0
+        while i < len(raw_line) and raw_line[1] == " ":
             spaces += 1
             i += 1
-
+        
         self.handle_indentation(spaces)
 
         if i >= len(raw_line) or raw_line[i] == "#":
